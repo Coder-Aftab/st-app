@@ -5,7 +5,7 @@ const app = express();
 const got = require("got");
 const cors = require("cors");
 
-//SMA
+//import indicators
 
 const {
   sma_inc,
@@ -14,10 +14,8 @@ const {
   rsi_inc,
   macd_inc,
 } = require("./indicators");
-
-const server = app.listen(3001, log("Proxy Server Running on Port 3001"));
-app.get("/", (_, res) => res.status(200).send("Proxy Server Works"));
 app.use(cors());
+app.get("/", (_, res) => res.status(200).send("Proxy Server Works"));
 app.get("/:symbol", async (req, res) => {
   try {
     const { symbol } = req.params;
@@ -45,4 +43,8 @@ app.get("/:symbol", async (req, res) => {
   } catch (err) {
     res.status(500).send(err);
   }
+});
+
+app.listen(process.env.Port || 5000, () => {
+  log(`Proxy Server Running `);
 });

@@ -3,3 +3,4 @@ dist
 .cache
 .vscode
 extra
+package-lock.json
