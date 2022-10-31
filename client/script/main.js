@@ -2,7 +2,9 @@ const { log, error } = console;
 import { targets } from "./allTargets.js";
 const getData = async (symbol) => {
   try {
-    const resp = await fetch(`http://localhost:3001/${symbol}`);
+    const resp = await fetch(
+      `https://st-app-aftab-api.herokuapp.com/${symbol}`
+    );
     const data = await resp.json();
     return data;
   } catch (error) {
