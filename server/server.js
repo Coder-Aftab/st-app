@@ -1,12 +1,10 @@
-const log = console.log;
-const { json } = require("express");
+const { log } = console;
 const express = require("express");
 const app = express();
 const got = require("got");
 const cors = require("cors");
-
+const { PORT = 3000, LOCAL_ADDRESS = "0.0.0.0" } = process.env;
 //import indicators
-
 const {
   sma_inc,
   ema_inc,
@@ -39,12 +37,12 @@ app.get("/:symbol", async (req, res) => {
     klineData = await markers_inc(klineData);
     klineData = await rsi_inc(klineData);
     klineData = await macd_inc(klineData);
-    res.status(200).json(klineData);
+    res.status(200).send(klineData);
   } catch (err) {
     res.status(500).send(err);
   }
 });
 
-app.listen(process.env.Port || 5000, () => {
-  log(`Proxy Server Running `);
+app.listen(PORT, LOCAL_ADDRESS, () => {
+  log(`Proxy Server Running ${PORT}`);
 });
