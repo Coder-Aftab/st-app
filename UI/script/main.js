@@ -1,16 +1,20 @@
 const { log, error } = console;
-
-const getData = async (symbol, interval) => {
+import { targets } from "./allTargets.js";
+const getData = async (symbol) => {
   try {
-    const resp = await fetch(`http://127.0.0.1:3001/BTC/1`);
+    const resp = await fetch(`http://localhost:3001/${symbol}`);
     const data = await resp.json();
     return data;
   } catch (error) {
-    alert("Please enter correct input", error);
+    log(error);
   }
 };
 
-const renderChart = async (symbol = "BTC", interval = "1") => {
+//generate random targets coins
+const newSymbol = Math.floor(Math.random() * targets.length);
+
+//render Charts
+const renderChart = async (symbol = "BTC") => {
   const root = document.getElementById("root");
   if (root.childElementCount) {
     root.removeChild(root.firstElementChild);
@@ -20,12 +24,16 @@ const renderChart = async (symbol = "BTC", interval = "1") => {
       timeVisible: true,
       secondVisible: true,
     },
-    pane:0,
+    pane: 0,
   };
 
   const chart = LightweightCharts.createChart(root, chartProperties);
-  const candlestickSeries = chart.addCandlestickSeries({ title: "Primary" });
-  const klineData = await getData(symbol, interval);
+  const candlestickSeries = chart.addCandlestickSeries();
+  //legend
+  const toolTip = document.querySelector("#legend");
+  toolTip.innerHTML = `<div style="font-size: 24px; margin: 4px 0px; color: #20262E"> ${targets[newSymbol]}</div>`;
+
+  const klineData = await getData(targets[newSymbol]);
   candlestickSeries.setData(klineData);
 
   //SMA
@@ -71,7 +79,7 @@ const renderChart = async (symbol = "BTC", interval = "1") => {
     title: "RSI",
     color: "purple",
     lineWidth: 1,
-    pane:1,
+    pane: 1,
   });
 
   const rsi_data = klineData
@@ -80,6 +88,39 @@ const renderChart = async (symbol = "BTC", interval = "1") => {
   //log(rsi_data);
   rsi_series.setData(rsi_data);
   //log(rsi_series)
+  //MACD FAST
+  const macd_fast_series = chart.addLineSeries({
+    title: "macd",
+    color: "blue",
+    lineWidth: 1,
+    pane: 2,
+  });
+  const macd_fast_data = klineData
+    .filter((d) => d.macd_fast)
+    .map((d) => ({ time: d.time, value: d.macd_fast }));
+  macd_fast_series.setData(macd_fast_data);
+  //MACD SLOW
+  const macd_slow_series = chart.addLineSeries({
+    color: "red",
+    lineWidth: 1,
+    pane: 2,
+  });
+  const macd_slow_data = klineData
+    .filter((d) => d.macd_slow)
+    .map((d) => ({ time: d.time, value: d.macd_slow }));
+  macd_slow_series.setData(macd_slow_data);
+  //MACD HISTOGRAM
+  const macd_histogram_series = chart.addHistogramSeries({
+    pane: 2,
+  });
+  const macd_histogram_data = klineData
+    .filter((d) => d.macd_histogram)
+    .map((d) => ({
+      time: d.time,
+      value: d.macd_histogram,
+      color: d.macd_histogram > 0 ? "green" : "red",
+    }));
+  macd_histogram_series.setData(macd_histogram_data);
 };
 
 renderChart();
@@ -92,65 +133,3 @@ renderChart();
 //   renderChart(symbol, interval);
 //   form.reset();
 // };
-
-
-// const renderChart = async () => {
-//   const chartProperties = {
-//     timeScale: {
-//       timeVisible: true,
-//       secondsVisible: true,
-//     },
-//     pane: 0,
-//   };
-//   const domElement = document.getElementById('root');
-//   const chart = LightweightCharts.createChart(domElement, chartProperties);
-//   const candleseries = chart.addCandlestickSeries();
-//   const klinedata = await getData();
-//   candleseries.setData(klinedata);
-//   //SMA
-//   const sma_series = chart.addLineSeries({ color: 'red', lineWidth: 1 });
-//   const sma_data = klinedata
-//     .filter((d) => d.sma)
-//     .map((d) => ({ time: d.time, value: d.sma }));
-//   sma_series.setData(sma_data);
-//   //EMA
-//   const ema_series = chart.addLineSeries({ color: 'green', lineWidth: 1 });
-//   const ema_data = klinedata
-//     .filter((d) => d.ema)
-//     .map((d) => ({ time: d.time, value: d.ema }));
-//   ema_series.setData(ema_data);
-//   //MARKERS
-//   candleseries.setMarkers(
-//     klinedata
-//       .filter((d) => d.long || d.short)
-//       .map((d) =>
-//         d.long
-//           ? {
-//             time: d.time,
-//             position: 'belowBar',
-//             color: 'green',
-//             shape: 'arrowUp',
-//             text: 'LONG',
-//           }
-//           : {
-//             time: d.time,
-//             position: 'aboveBar',
-//             color: 'red',
-//             shape: 'arrowDown',
-//             text: 'SHORT',
-//           }
-//       )
-//   );
-//   //RSI
-//   const rsi_series = chart.addLineSeries({
-//     color: 'purple',
-//     lineWidth: 1,
-//     pane: 1,
-//   });
-//   const rsi_data = klinedata
-//     .filter((d) => d.rsi)
-//     .map((d) => ({ time: d.time, value: d.rsi }));
-//   rsi_series.setData(rsi_data);
-// }
-
-// renderChart();
