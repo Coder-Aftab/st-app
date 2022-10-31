@@ -1,13 +1,9 @@
 #root {
   width: 90vw;
-  height: 50vh;
+  height: 100vh;
 }
 .form {
   margin: 2rem;
   display: flex;
   justify-content: center;
-}
-#rsi {
-  width: 90vw;
-  height: 30vh;
 }

@@ -9,7 +9,7 @@ const cors = require("cors");
 
 const { sma_inc, ema_inc, markers_inc, rsi_inc } = require("./indicators");
 
-const server = app.listen(3000, log("Proxy Server Running on Port 3000"));
+const server = app.listen(3001, log("Proxy Server Running on Port 3001"));
 app.get("/", (_, res) => res.status(200).send("Proxy Server Works"));
 app.use(cors());
 app.get("/:symbol/:interval", async (req, res) => {

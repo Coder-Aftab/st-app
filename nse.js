@@ -21,7 +21,7 @@ for (let i = 0; i < open.length; i++){
     close:close[i]*1
   })
 }
-
+app.use(cors())
 app.get('/', async (req, res) => {
   try {
       res.status(200).json(nData)
